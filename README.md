@@ -1,37 +1,76 @@
-# Retail-Data-Analytics-with-time-series-analysis-and-machine-learning-model
+# Retail Demand Forecasting — Walmart Store Sales
 
-# About the dataset
-A retail company operate 45 retail stores across multiple regions, with each store consisting of several departments. 
-Throughout the year, the company organises several markdown events, particularly in the weeks leading up to major holidays. 
-The four most significant holidays are the Super Bowl, Labour Day, Thanksgiving, and Christmas. For evaluation purposes, the weeks that include these 
-Holidays are given five times the weight of non-holiday weeks.
+## Business Problem
+Walmart operates 45 stores across multiple regions, running markdown 
+promotions around major holidays (Super Bowl, Labour Day, Thanksgiving, 
+Christmas). The core challenge: can we forecast department-level weekly 
+sales accurately enough to optimise markdown timing and inventory 
+positioning — even with limited historical data on rare events?
 
-One of the primary challenges in modeling retail data is the need to make decisions with limited historical information. 
-Major holidays and key events occur only once a year, which restricts the opportunity to evaluate how strategic decisions influence overall performance. 
-Additionally, markdowns are known to significantly impact sales, but the difficulty lies in predicting which departments will be affected and to what extent.
+## Key Questions
+1. Which departments and stores are most sensitive to holiday markdowns?
+2. How accurately can we forecast 4–12 weeks ahead at department level?
+3. What does model error cost in real inventory terms?
 
-Three Separate CSV Data Files have been uploaded.
-# Stores
-Anonymised information about the 45 stores, indicating the type and size of store 
-# Features
-1. Store - the store number
-2. Temperature - average temperature in the region
-3. Fuel_Price - cost of fuel in the region
-4. MarkDown1-5 - anonymized data related to promotional markdowns. MarkDown data is only available after Nov 2011, and is not available for all stores all the time.
- Any missing value is marked with an NA.
-5.CPI - the consumer price index
-6.Unemployment - the unemployment rate
-7.IsHoliday - whether the week is a special holiday week
-# Sales
-1.Store - the store number
-2. Dept - the department number
-3. Date - the week
-4. Weekly_Sales -  sales for the given department in the given store
-5. IsHoliday - whether the week is a special holiday week
+## Dataset
+- **Source:** Walmart Recruiting - Store Sales Forecasting (Kaggle)
+- **Scale:** 45 stores, 99 departments, ~2.5 years of weekly sales data
+- **Features:** Temperature, fuel price, CPI, unemployment, 
+  markdown events (MarkDown1–5), holiday flags
 
+## Approach
+### 1. Exploratory Analysis
+- Decomposed sales into trend, seasonality, and residuals
+- Identified holiday uplift patterns across departments
+- Tested stationarity using ADF test
 
+### 2. Feature Engineering
+- Lag features: 1, 2, 4, 12 weeks prior sales
+- Rolling averages: 4, 12, 52-week windows
+- Holiday interaction features
 
-# The Task
-1. Predict the department-wide sales for each store for the following year.
-2. Model the effects of markdowns on holiday weeks.
-3. Provide recommended actions based on the insights drawn, with prioritization placed on largest business impact
+### 3. Models
+| Model | Approach |
+|-------|----------|
+| Facebook Prophet | Weekly + yearly seasonality with holiday regressors |
+| LightGBM | Gradient boosting with lag/rolling features |
+
+### 4. Evaluation
+Models evaluated using Weighted MAE (WMAE) — holiday weeks 
+weighted 5x heavier, consistent with Walmart's business priority.
+
+## Key Findings
+- Holiday weeks drive disproportionate variance — especially 
+  Thanksgiving and Christmas
+- LightGBM with lag features outperformed Prophet on 
+  short-horizon forecasts
+- Markdown effects vary significantly by department — 
+  not all departments respond equally to promotions
+- Rolling 52-week features provided strongest signal for 
+  seasonal baseline
+
+## Business Recommendations
+1. Prioritise markdown investment in high-sensitivity departments 
+   identified by elasticity analysis
+2. Use 4-week lag features as minimum input for replenishment 
+   planning cycles
+3. Flag holiday weeks for manual review — model uncertainty 
+   increases significantly on sparse holiday data
+
+## Tech Stack
+- Python (Pandas, NumPy, Scikit-learn, LightGBM, Prophet)
+- Jupyter Notebook
+- Matplotlib / Seaborn
+
+## How to Run
+```bash
+pip install pandas numpy scikit-learn lightgbm prophet matplotlib seaborn
+```
+Open `walmart_demand_forecasting.ipynb` and run all cells.
+Data files are included in the `/data` folder.
+
+## Relevance to Supply Chain Roles
+This project directly mirrors the work of a demand planning or 
+replenishment analyst — forecasting at SKU/store level, 
+accounting for promotional events, and quantifying model 
+error in business terms.
