@@ -62,15 +62,4 @@ weighted 5x heavier, consistent with Walmart's business priority.
 - Jupyter Notebook
 - Matplotlib / Seaborn
 
-## How to Run
-```bash
-pip install pandas numpy scikit-learn lightgbm prophet matplotlib seaborn
-```
-Open `walmart_demand_forecasting.ipynb` and run all cells.
-Data files are included in the `/data` folder.
 
-## Relevance to Supply Chain Roles
-This project directly mirrors the work of a demand planning or 
-replenishment analyst — forecasting at SKU/store level, 
-accounting for promotional events, and quantifying model 
-error in business terms.
